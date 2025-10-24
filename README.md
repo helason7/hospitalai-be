@@ -34,7 +34,7 @@ POST http://127.0.0.1:8000/recommend
 
 ```
 request body: {
-  "llm": "gemini",
+  "llm": "grok", // dapat diganti dengan "gemini" atau "openai"
   "gender": "female",
   "age": 62,
   "symptoms": ["pusing", "mual", "sulit berjalan"]
