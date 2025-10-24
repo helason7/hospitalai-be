@@ -7,6 +7,24 @@ from fastapi import FastAPI, HTTPException
 import asyncio
 from pydantic import BaseModel
 from typing import List
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+app = FastAPI(title="Hospital Department Recommender")
+
+origins = [
+    "http://localhost:5173",             # lokal dev
+    "https://hospitalai-fe.vercel.app",  # domain Vue di Vercel
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,       # daftar origin yang diizinkan
+    allow_credentials=True,
+    allow_methods=["*"],         # izinkan GET, POST, OPTIONS, dll
+    allow_headers=["*"],         # izinkan semua header
+)
+
 # Load environment variables
 load_dotenv()
 
@@ -21,8 +39,6 @@ from langchain_groq import ChatGroq
 
 # OpenAI-compatible
 from langchain_openai import ChatOpenAI
-
-app = FastAPI(title="Hospital Department Recommender")
 
 # ---------- Input Schema ----------
 class PatientInput(BaseModel):
