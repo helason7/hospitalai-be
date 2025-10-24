@@ -1,6 +1,7 @@
-# 🏥 Hospital Department Recommender API
+# 🏥 DiagnoX (Hospital Assistant) API
 
-A minimal FastAPI service that recommends the most relevant specialist department based on patient information using a mock LLM.
+Aplikasi back-end yg dibuat dengan fastAPI + LLM Gemini, Groq, dan OpenAI. 
+Digunakan untuk memberikan rekomendasi departement kesehatan, kemungkinan penyakit, dan penanganan awal yg terkait dengan data gender, umur, dan gejala pasien.
 
 ## 🚀 How to Run
 
@@ -39,6 +40,25 @@ request body: {
   "symptoms": ["pusing", "mual", "sulit berjalan"]
 }
 ```
-response: {
-  "recommended_department": "Neurology"
+
+```
+{
+    "recommended_department": [
+        "Neurologi",
+        "Kardiologi",
+        "Geriatri"
+    ],
+    "possibility_of_illness": [
+        "Migrain vestibular",
+        "Stroke atau penyakit serebrovaskular",
+        "Gangguan neurologis (misalnya penyakit Parkinson, sklerosis multipel)"
+    ],
+    "initial_handling": [
+        "Periksa tanda vital (tekanan darah, denyut jantung, gula darah) untuk menyingkirkan kondisi yang mengancam jiwa secara langsung.",
+        "Lakukan pemeriksaan neurologis untuk menilai keseimbangan, koordinasi, dan fungsi kognitif.",
+        "Pertimbangkan studi pencitraan (misalnya MRI, CT scan) untuk mengevaluasi kemungkinan stroke atau kelainan struktural lainnya."
+    ]
 }
+```
+
+link: https://diagnox-dist.vercel.app/
