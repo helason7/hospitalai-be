@@ -14,7 +14,7 @@ app = FastAPI(title="Hospital Department Recommender")
 
 origins = [
     "http://localhost:5173",             # lokal dev
-    "https://diagnox-dist.vercel.app/",  # domain Vue di Vercel
+    "https://diagnox-dist.vercel.app",  # domain Vue di Vercel
 ]
 
 app.add_middleware(
