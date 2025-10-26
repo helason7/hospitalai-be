@@ -16,7 +16,15 @@ conda activate nama-environment
 ```
 gunakan python 3.10 (reccomend)
 
-### Tambahkan file .env ke dalam folder
+### rename file .env.example menjadi .env
+- buat goole api-key di link ini: https://aistudio.google.com/api-keys
+- tambahkan ke dalam variable GOOGLE_API_KEY yg ada di file .env seperti ini:
+```
+GOOGLE_API_KEY=contoh-apikey
+```
+- lakukan hal yg sama untuk variable GROQ_API_KEY dan OPENAI_API_KEY
+- Groq: https://console.groq.com/keys
+- OpenAI: https://platform.openai.com/api-keys
 
 ### 1️⃣ Install dependencies
 ```bash
@@ -61,4 +69,4 @@ request body: {
 }
 ```
 
-link: https://diagnox-dist.vercel.app/
+apps link: https://diagnox-dist.vercel.app/
