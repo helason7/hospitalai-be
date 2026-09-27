@@ -6,15 +6,10 @@ from api.v1 import document, recommendations, history, survey
 
 app = FastAPI(title="Hospital Department Recommender with RAG (Modular)")
 
-origins = [
-    "http://localhost:5173",             # lokal dev
-    "https://diagnox-dist.vercel.app",  # domain Vue di Vercel
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
