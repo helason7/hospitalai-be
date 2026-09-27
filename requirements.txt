@@ -6,3 +6,10 @@ pydantic
 langchain-groq
 langchain-openai
 python-dotenv
+chromadb
+pypdf
+python-multipart
+langchain-community
+sqlalchemy
+sentence-transformers
+langchain-huggingface
