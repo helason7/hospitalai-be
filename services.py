@@ -17,7 +17,7 @@ def get_vectorstore():
 def get_llm():
     """Menggunakan Google Gemini API sebagai satu-satunya model."""
     return ChatGoogleGenerativeAI(
-        model="gemini-2.5-flash",
+        model="gemini-3.8-flash",
         google_api_key=os.getenv("GOOGLE_API_KEY"),
         temperature=0.2, # Temperature rendah agar jawaban konsisten dan tidak halusinasi
         timeout=100

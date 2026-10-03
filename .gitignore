@@ -1,4 +1,24 @@
-.env
+# Byte-compiled / optimized / DLL files
 __pycache__/
-chroma_db/
+*.py[cod]
+*$py.class
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Database files
+*.sqlite3
 *.db
+
+# Chroma DB
+chroma_db/
+
+# IDEs / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -63,7 +63,15 @@ async def get_recommendations(patient: PatientInput, db: Session = Depends(get_d
             llm.ainvoke([HumanMessage(content=prompt)]),
             timeout=300
         )
-        text = response.content.strip()
+        content_data = response.content
+        if isinstance(content_data, list):
+            text = "".join(
+                c.get("text", "") if isinstance(c, dict) else str(c)
+                for c in content_data
+            )
+        else:
+            text = str(content_data)
+        text = text.strip()
         
         start = text.find("{")
         end = text.rfind("}") + 1
