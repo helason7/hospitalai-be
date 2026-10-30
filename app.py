@@ -20,3 +20,10 @@ app.include_router(document.router, prefix="/api/v1", tags=["Documents"])
 app.include_router(recommendations.router, prefix="/api/v1", tags=["Recommendations"])
 app.include_router(history.router, prefix="/api/v1", tags=["History"])
 app.include_router(survey.router, prefix="/api/v1", tags=["Survey"])
+
+@app.get("/health", tags=["Health"])
+async def health_check():
+    return {"status": "ok"}
+
+
+
