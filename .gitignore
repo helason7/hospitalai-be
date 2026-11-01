@@ -18,6 +18,7 @@ ENV/
 
 # Chroma DB
 chroma_db/
+chroma_db_backup/
 
 # IDEs / OS
 .vscode/

@@ -5,6 +5,11 @@ from datetime import datetime
 class SourceInfo(BaseModel):
     document_name: str
     document_url: Optional[str] = None
+    pages: List[int] = []
+
+class IllnessPossibility(BaseModel):
+    name: str
+    percentage: int
 
 class PatientInput(BaseModel):
     gender: str
@@ -13,7 +18,7 @@ class PatientInput(BaseModel):
 
 class RecommendationOutput(BaseModel):
     recommended_department: list[str]
-    possibility_of_illness: list[str]
+    possibility_of_illness: list[IllnessPossibility]
     initial_handling: list[str]
     sources: List[SourceInfo] = []
 

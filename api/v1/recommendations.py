@@ -28,11 +28,21 @@ async def get_recommendations(patient: PatientInput, db: Session = Depends(get_d
     for doc in relevant_docs:
         doc_name = doc.metadata.get("document_name", "Dokumen Tidak Diketahui")
         doc_url = doc.metadata.get("document_url", "")
+        # PyPDFLoader page dimulai dari indeks 0, tambahkan 1 agar sesuai halaman PDF asli
+        page_raw = doc.metadata.get("page")
+        page_num = (int(page_raw) + 1) if page_raw is not None else None
         
         if doc_name not in sources_dict:
-            sources_dict[doc_name] = doc_url if doc_url else None
+            sources_dict[doc_name] = {
+                "url": doc_url if doc_url else None,
+                "pages": []
+            }
             
-        context_chunks.append(f"[Dokumen: {doc_name}]\n{doc.page_content}")
+        if page_num is not None and page_num not in sources_dict[doc_name]["pages"]:
+            sources_dict[doc_name]["pages"].append(page_num)
+            
+        page_info = f" (Halaman {page_num})" if page_num else ""
+        context_chunks.append(f"[Dokumen: {doc_name}{page_info}]\n{doc.page_content}")
     
     context = "\n\n".join(context_chunks)
     context_text = f"Dokumen Panduan Klinis Tersedia:\n---\n{context}\n---\n\n" if context else ""
@@ -51,12 +61,15 @@ async def get_recommendations(patient: PatientInput, db: Session = Depends(get_d
         f"2. Jika dokumen TIDAK relevan (contoh: gejala pasien berkaitan dengan psikologis/kejiwaan, luka luar/trauma, atau penyakit lain yang TIDAK dibahas secara spesifik dalam dokumen panduan klinis di atas), "
         f"maka field 'used_sources' WAJIB bernilai list kosong []. JANGAN PERNAH menyertakan atau merekomendasikan dokumen yang tidak sesuai!\n"
         f"3. Hanya jika dokumen tersebut memang relevan dan menjadi dasar rujukan diagnosis/tindakan, cantumkan nama dokumen persis seperti di header [Dokumen: ...] ke dalam list 'used_sources'.\n"
-        f"4. Anda tetap wajib memberikan rekomendasi poliklinik, kemungkinan penyakit, dan penanganan awal berdasarkan pengetahuan medis umum Anda meskipun dokumen referensi tidak tersedia.\n\n"
+        f"4. Anda tetap wajib memberikan rekomendasi poliklinik, kemungkinan penyakit (beserta estimasi persentase probabilitas kecocokan klinis 1-100% yang diurutkan dari tertinggi ke terendah), dan penanganan awal berdasarkan pengetahuan medis umum Anda meskipun dokumen referensi tidak tersedia.\n\n"
         f"Jawab HANYA dalam format JSON berikut dalam Bahasa Indonesia, tanpa teks tambahan apapun di luar JSON:\n"
         f"{{\n"
         f'  "department": ["Poli Jiwa", "Poli Penyakit Dalam"],  // max 3 poli\n'
         f'  "initial_handling": ["Konseling awal", "Latihan pernapasan"], // max 3 langkah penanganan\n'
-        f'  "possibility_of_illness": ["Gangguan Kecemasan"], // max 3 kemungkinan penyakit\n'
+        f'  "possibility_of_illness": [\n'
+        f'    {{"name": "Gangguan Kecemasan", "percentage": 85}},\n'
+        f'    {{"name": "Dispepsia Fungsional", "percentage": 60}}\n'
+        f'  ], // max 3 kemungkinan penyakit beserta estimasi persentase probabilitas\n'
         f'  "used_sources": ["Nama Dokumen Relevan"] // WAJIB kosong [] jika gejala/penyakit tidak memiliki dokumen referensi yang cocok\n'
         f"}}"
     )
@@ -85,21 +98,38 @@ async def get_recommendations(patient: PatientInput, db: Session = Depends(get_d
         data = json.loads(json_str)
         
         recommended_dept = data.get("department", [])
-        illness = data.get("possibility_of_illness", [])
+        raw_illness = data.get("possibility_of_illness", [])
         handling = data.get("initial_handling", [])
         used_sources = data.get("used_sources", [])
+        
+        # Format list kemungkinan penyakit beserta persentasenya
+        illness = []
+        if isinstance(raw_illness, list):
+            for item in raw_illness:
+                if isinstance(item, dict):
+                    name = str(item.get("name", "")).strip()
+                    try:
+                        pct = int(item.get("percentage", 50))
+                    except (ValueError, TypeError):
+                        pct = 50
+                    pct = max(1, min(100, pct))
+                    if name:
+                        illness.append({"name": name, "percentage": pct})
+                elif isinstance(item, str) and item.strip():
+                    illness.append({"name": item.strip(), "percentage": 50})
         
         # Strict RAG Filter: Hanya sertakan dokumen yang dikonfirmasi relevan oleh LLM
         final_sources = []
         if isinstance(used_sources, list) and used_sources:
-            for doc_name, doc_url in sources_dict.items():
+            for doc_name, source_info in sources_dict.items():
                 doc_name_lower = doc_name.strip().lower()
                 for used in used_sources:
                     used_lower = str(used).strip().lower()
                     if used_lower and (used_lower == doc_name_lower or used_lower in doc_name_lower or doc_name_lower in used_lower):
                         final_sources.append({
                             "document_name": doc_name,
-                            "document_url": doc_url
+                            "document_url": source_info["url"],
+                            "pages": sorted(source_info["pages"])
                         })
                         break
         

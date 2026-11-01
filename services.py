@@ -18,8 +18,8 @@ else:
 CHROMA_DB_DIR = os.path.join(os.path.dirname(__file__), "chroma_db")
 
 def get_vectorstore():
-    # Menggunakan model embedding lokal yang gratis dan tanpa limit
-    embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+    # Menggunakan model embedding multilingual yang mendukung Bahasa Indonesia
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
     vectorstore = Chroma(persist_directory=CHROMA_DB_DIR, embedding_function=embeddings)
     return vectorstore
 
